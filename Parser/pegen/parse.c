@@ -6959,7 +6959,11 @@ expressions_rule(Parser *p)
     return _res;
 }
 
-// expression: disjunction 'if' disjunction 'else' expression | disjunction | lambdef
+// expression:
+//     | disjunction 'if' disjunction 'else' expression
+//     | disjunction 'if' disjunction
+//     | disjunction
+//     | lambdef
 static expr_ty
 expression_rule(Parser *p)
 {
@@ -7027,6 +7031,45 @@ expression_rule(Parser *p)
         p->mark = _mark;
         D(fprintf(stderr, "%*c%s expression[%d-%d]: %s failed!\n", p->level, ' ',
                   p->error_indicator ? "ERROR!" : "-", _mark, p->mark, "disjunction 'if' disjunction 'else' expression"));
+    }
+    { // disjunction 'if' disjunction
+        if (p->error_indicator) {
+            D(p->level--);
+            return NULL;
+        }
+        D(fprintf(stderr, "%*c> expression[%d-%d]: %s\n", p->level, ' ', _mark, p->mark, "disjunction 'if' disjunction"));
+        Token * _keyword;
+        expr_ty a;
+        expr_ty b;
+        if (
+            (a = disjunction_rule(p))  // disjunction
+            &&
+            (_keyword = _PyPegen_expect_token(p, 510))  // token='if'
+            &&
+            (b = disjunction_rule(p))  // disjunction
+        )
+        {
+            D(fprintf(stderr, "%*c+ expression[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "disjunction 'if' disjunction"));
+            Token *_token = _PyPegen_get_last_nonnwhitespace_token(p);
+            if (_token == NULL) {
+                D(p->level--);
+                return NULL;
+            }
+            int _end_lineno = _token->end_lineno;
+            UNUSED(_end_lineno); // Only used by EXTRA macro
+            int _end_col_offset = _token->end_col_offset;
+            UNUSED(_end_col_offset); // Only used by EXTRA macro
+            _res = _Py_IfExp ( b , a , _Py_Constant ( Py_None , NULL , EXTRA ) , EXTRA );
+            if (_res == NULL && PyErr_Occurred()) {
+                p->error_indicator = 1;
+                D(p->level--);
+                return NULL;
+            }
+            goto done;
+        }
+        p->mark = _mark;
+        D(fprintf(stderr, "%*c%s expression[%d-%d]: %s failed!\n", p->level, ' ',
+                  p->error_indicator ? "ERROR!" : "-", _mark, p->mark, "disjunction 'if' disjunction"));
     }
     { // disjunction
         if (p->error_indicator) {
