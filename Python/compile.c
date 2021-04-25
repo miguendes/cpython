@@ -2630,9 +2630,15 @@ compiler_ifexp(struct compiler *c, expr_ty e)
     if (!compiler_jump_if(c, e->v.IfExp.test, next, 0))
         return 0;
     VISIT(c, expr, e->v.IfExp.body);
-    ADDOP_JREL(c, JUMP_FORWARD, end);
-    compiler_use_next_block(c, next);
-    VISIT(c, expr, e->v.IfExp.orelse);
+
+    if (e->v.IfExp.orelse == NULL) {
+        ADDOP_LOAD_CONST(c, Py_None);
+    } else {
+        ADDOP_JREL(c, JUMP_FORWARD, end);
+        compiler_use_next_block(c, next);
+        VISIT(c, expr, e->v.IfExp.orelse);
+    }
+
     compiler_use_next_block(c, end);
     return 1;
 }

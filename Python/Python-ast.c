@@ -1404,7 +1404,7 @@ static int init_types(astmodulestate *state)
         "     | BinOp(expr left, operator op, expr right)\n"
         "     | UnaryOp(unaryop op, expr operand)\n"
         "     | Lambda(arguments args, expr body)\n"
-        "     | IfExp(expr test, expr body, expr orelse)\n"
+        "     | IfExp(expr test, expr body, expr? orelse)\n"
         "     | Dict(expr* keys, expr* values)\n"
         "     | Set(expr* elts)\n"
         "     | ListComp(expr elt, comprehension* generators)\n"
@@ -1455,8 +1455,10 @@ static int init_types(astmodulestate *state)
     if (!state->Lambda_type) return 0;
     state->IfExp_type = make_type(state, "IfExp", state->expr_type,
                                   IfExp_fields, 3,
-        "IfExp(expr test, expr body, expr orelse)");
+        "IfExp(expr test, expr body, expr? orelse)");
     if (!state->IfExp_type) return 0;
+    if (PyObject_SetAttr(state->IfExp_type, state->orelse, Py_None) == -1)
+        return 0;
     state->Dict_type = make_type(state, "Dict", state->expr_type, Dict_fields,
                                  2,
         "Dict(expr* keys, expr* values)");
@@ -2694,11 +2696,6 @@ IfExp(expr_ty test, expr_ty body, expr_ty orelse, int lineno, int col_offset,
     if (!body) {
         PyErr_SetString(PyExc_ValueError,
                         "field 'body' is required for IfExp");
-        return NULL;
-    }
-    if (!orelse) {
-        PyErr_SetString(PyExc_ValueError,
-                        "field 'orelse' is required for IfExp");
         return NULL;
     }
     p = (expr_ty)PyArena_Malloc(arena, sizeof(*p));
@@ -7347,9 +7344,9 @@ obj2ast_expr(astmodulestate *state, PyObject* obj, expr_ty* out, PyArena* arena)
         if (_PyObject_LookupAttr(obj, state->orelse, &tmp) < 0) {
             return 1;
         }
-        if (tmp == NULL) {
-            PyErr_SetString(PyExc_TypeError, "required field \"orelse\" missing from IfExp");
-            return 1;
+        if (tmp == NULL || tmp == Py_None) {
+            Py_CLEAR(tmp);
+            orelse = NULL;
         }
         else {
             int res;

@@ -328,6 +328,7 @@ expressions[expr_ty]:
     | expression
 expression[expr_ty] (memo):
     | a=disjunction 'if' b=disjunction 'else' c=expression { _Py_IfExp(b, a, c, EXTRA) }
+    | a=disjunction 'if' b=disjunction { _Py_IfExp(b, a, NULL, EXTRA) }
     | disjunction
     | lambdef
 
