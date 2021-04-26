@@ -166,6 +166,31 @@ int_as_integer_ratio(PyObject *self, PyObject *Py_UNUSED(ignored))
     return int_as_integer_ratio_impl(self);
 }
 
+PyDoc_STRVAR(int_ndigits__doc__,
+"ndigits($self, /)\n"
+"--\n"
+"\n"
+"Return the number of digits in a int\n"
+"\n"
+">>> (1000).ndigits()\n"
+"4\n"
+">>> (-10).ndigits()\n"
+"2\n"
+">>> (0).ndigits()\n"
+"1");
+
+#define INT_NDIGITS_METHODDEF    \
+    {"ndigits", (PyCFunction)int_ndigits, METH_NOARGS, int_ndigits__doc__},
+
+static PyObject *
+int_ndigits_impl(PyObject *self);
+
+static PyObject *
+int_ndigits(PyObject *self, PyObject *Py_UNUSED(ignored))
+{
+    return int_ndigits_impl(self);
+}
+
 PyDoc_STRVAR(int_to_bytes__doc__,
 "to_bytes($self, /, length, byteorder, *, signed=False)\n"
 "--\n"
@@ -313,4 +338,4 @@ skip_optional_kwonly:
 exit:
     return return_value;
 }
-/*[clinic end generated code: output=77bc3b2615822cb8 input=a9049054013a1b77]*/
+/*[clinic end generated code: output=b3d494592207dba9 input=a9049054013a1b77]*/

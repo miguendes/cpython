@@ -5453,6 +5453,32 @@ int_as_integer_ratio_impl(PyObject *self)
 }
 
 /*[clinic input]
+int.ndigits
+
+Return the number of digits in a int
+
+>>> (1000).ndigits()
+4
+>>> (-10).ndigits()
+2
+>>> (0).ndigits()
+1
+[clinic start generated code]*/
+
+static PyObject *
+int_ndigits_impl(PyObject *self)
+/*[clinic end generated code: output=3e7c0e05253fe6ba input=78d40ef4e49b1f66]*/
+{
+    PyObject *str;
+    int err;
+    err = long_to_decimal_string_internal(self, &str, NULL, NULL, NULL);
+    if (err == -1)
+        return NULL;
+    Py_ssize_t n = PyObject_Length(str);
+
+    return PyLong_FromSsize_t(n);
+}
+/*[clinic input]
 int.to_bytes
 
     length: Py_ssize_t
@@ -5580,6 +5606,7 @@ static PyMethodDef long_methods[] = {
     INT_TO_BYTES_METHODDEF
     INT_FROM_BYTES_METHODDEF
     INT_AS_INTEGER_RATIO_METHODDEF
+    INT_NDIGITS_METHODDEF
     {"__trunc__",       long_long_meth, METH_NOARGS,
      "Truncating an Integral returns itself."},
     {"__floor__",       long_long_meth, METH_NOARGS,
