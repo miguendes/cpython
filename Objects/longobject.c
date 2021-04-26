@@ -5475,7 +5475,8 @@ int_ndigits_impl(PyObject *self)
     if (err == -1)
         return NULL;
     Py_ssize_t n = PyObject_Length(str);
-
+    if (_PyLong_Sign(self) < 0)
+        n--;
     return PyLong_FromSsize_t(n);
 }
 /*[clinic input]
