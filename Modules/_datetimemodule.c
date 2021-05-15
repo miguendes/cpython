@@ -2404,7 +2404,7 @@ accum(const char* tag, PyObject *sofar, PyObject *num, PyObject *factor,
     }
 
     PyErr_Format(PyExc_TypeError,
-                 "unsupported type for timedelta %s component: %s",
+                 "unsupported type for timedelta %s component: must be an int or float, not '%.200s'",
                  tag, Py_TYPE(num)->tp_name);
     return NULL;
 }

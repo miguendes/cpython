@@ -510,6 +510,13 @@ class TestTimeDelta(HarmlessMixedComparison, unittest.TestCase):
         eq(td(seconds=0.001), td(milliseconds=1))
         eq(td(milliseconds=0.001), td(microseconds=1))
 
+        # check bad arguments
+        for bad_arg in (object(), "12"):
+            error_msg = ("unsupported type for timedelta hours component: "
+                         "must be an int or float, not '{}'").format(type(bad_arg).__name__)
+            with self.assertRaisesRegex(TypeError, error_msg):
+                td(hours=bad_arg)
+
     def test_computations(self):
         eq = self.assertEqual
         td = timedelta
