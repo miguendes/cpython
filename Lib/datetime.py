@@ -2272,8 +2272,7 @@ class timezone(tzinfo):
                 raise ValueError("fromutc: dt.tzinfo "
                                  "is not self")
             return dt + self._offset
-        raise TypeError("fromutc() argument must be a datetime instance"
-                        " or None")
+        raise TypeError("fromutc: argument must be a datetime, not '%s'" % type(dt).__name__)
 
     _maxoffset = timedelta(hours=24, microseconds=-1)
     _minoffset = -_maxoffset

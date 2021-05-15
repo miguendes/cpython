@@ -336,6 +336,11 @@ class TestTimeZone(unittest.TestCase):
             self.assertEqual(local - utctime, tz.utcoffset(local))
             self.assertEqual(local,
                              self.DT.replace(tzinfo=timezone.utc))
+        # check error message
+        arg = b'2020-02-02'
+        with self.assertRaisesRegex(TypeError,
+                                    "fromutc: argument must be a datetime, not '{}'".format(type(arg).__name__)):
+            timezone.utc.fromutc(arg)
 
     def test_comparison(self):
         self.assertNotEqual(timezone(ZERO), timezone(HOUR))

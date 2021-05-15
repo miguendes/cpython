@@ -3995,8 +3995,8 @@ static PyObject *
 timezone_fromutc(PyDateTime_TimeZone *self, PyDateTime_DateTime *dt)
 {
     if (!PyDateTime_Check(dt)) {
-        PyErr_SetString(PyExc_TypeError,
-                        "fromutc: argument must be a datetime");
+        PyErr_Format(PyExc_TypeError, "fromutc: argument must be a datetime, not '%.200s'",
+                     Py_TYPE(dt)->tp_name);
         return NULL;
     }
     if (!HASTZINFO(dt) || dt->tzinfo != (PyObject *)self) {
