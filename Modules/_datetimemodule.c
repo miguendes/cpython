@@ -428,7 +428,7 @@ check_date_args(int year, int month, int day)
     int dim = days_in_month(year, month);
     if (day < 1 || day > dim) {
         PyErr_Format(PyExc_ValueError,
-                        "day is out of range for month, must be in 1..%i, got %i", dim, day);
+                     "day is out of range for month, must be in 1..%i, got %i", dim, day);
         return -1;
     }
     return 0;
@@ -441,23 +441,19 @@ static int
 check_time_args(int h, int m, int s, int us, int fold)
 {
     if (h < 0 || h > 23) {
-        PyErr_Format(PyExc_ValueError,
-                        "hour must be in 0..23, got %i", h);
+        PyErr_Format(PyExc_ValueError, "hour must be in 0..23, got %i", h);
         return -1;
     }
     if (m < 0 || m > 59) {
-        PyErr_Format(PyExc_ValueError,
-                        "minute must be in 0..59, got %i", m);
+        PyErr_Format(PyExc_ValueError, "minute must be in 0..59, got %i", m);
         return -1;
     }
     if (s < 0 || s > 59) {
-        PyErr_Format(PyExc_ValueError,
-                        "second must be in 0..59, got %i", s);
+        PyErr_Format(PyExc_ValueError, "second must be in 0..59, got %i", s);
         return -1;
     }
     if (us < 0 || us > 999999) {
-        PyErr_Format(PyExc_ValueError,
-                        "microsecond must be in 0..999999, got %i", us);
+        PyErr_Format(PyExc_ValueError, "microsecond must be in 0..999999, got %i", us);
         return -1;
     }
     if (fold != 0 && fold != 1) {
@@ -2965,7 +2961,8 @@ date_fromisoformat(PyObject *cls, PyObject *dtstr)
     assert(dtstr != NULL);
 
     if (!PyUnicode_Check(dtstr)) {
-        PyErr_Format(PyExc_TypeError, "fromisoformat: argument must be str, not '%.200s'",
+        PyErr_Format(PyExc_TypeError,
+                     "fromisoformat: argument must be str, not '%.200s'",
                      Py_TYPE(dtstr)->tp_name);
         return NULL;
     }
@@ -3661,7 +3658,8 @@ tzinfo_fromutc(PyDateTime_TZInfo *self, PyObject *dt)
     PyDateTime_Delta *delta = NULL;
 
     if (!PyDateTime_Check(dt)) {
-        PyErr_Format(PyExc_TypeError, "fromutc: argument must be a datetime, not '%.200s'",
+        PyErr_Format(PyExc_TypeError,
+                     "fromutc: argument must be a datetime, not '%.200s'",
                      Py_TYPE(dt)->tp_name);
         return NULL;
     }
@@ -3999,7 +3997,8 @@ static PyObject *
 timezone_fromutc(PyDateTime_TimeZone *self, PyDateTime_DateTime *dt)
 {
     if (!PyDateTime_Check(dt)) {
-        PyErr_Format(PyExc_TypeError, "fromutc: argument must be a datetime, not '%.200s'",
+        PyErr_Format(PyExc_TypeError,
+                     "fromutc: argument must be a datetime, not '%.200s'",
                      Py_TYPE(dt)->tp_name);
         return NULL;
     }
@@ -4574,7 +4573,8 @@ time_fromisoformat(PyObject *cls, PyObject *tstr) {
     assert(tstr != NULL);
 
     if (!PyUnicode_Check(tstr)) {
-        PyErr_Format(PyExc_TypeError, "fromisoformat: argument must be str, not '%.200s'",
+        PyErr_Format(PyExc_TypeError,
+                     "fromisoformat: argument must be str, not '%.200s'",
                      Py_TYPE(tstr)->tp_name);
         return NULL;
     }
@@ -4931,9 +4931,9 @@ utc_to_seconds(int year, int month, int day,
 
     /* ymd_to_ord() doesn't support year <= 0 */
     if (year < MINYEAR || year > MAXYEAR) {
-        PyErr_Format(PyExc_ValueError, "year %i is out of range", year,
-                     "must be in %i..%i", MINYEAR, MAXYEAR,
-                     ", got %i", year);
+        PyErr_Format(PyExc_ValueError,
+                     "year is out of range, must be in %i..%i, got %i",
+                     MINYEAR, MAXYEAR, year);
         return -1;
     }
 
@@ -5244,7 +5244,8 @@ datetime_fromisoformat(PyObject *cls, PyObject *dtstr)
     assert(dtstr != NULL);
 
     if (!PyUnicode_Check(dtstr)) {
-        PyErr_Format(PyExc_TypeError, "fromisoformat: argument must be str, not '%.200s'",
+        PyErr_Format(PyExc_TypeError,
+                     "fromisoformat: argument must be str, not '%.200s'",
                      Py_TYPE(dtstr)->tp_name);
         return NULL;
     }
