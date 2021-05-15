@@ -416,17 +416,19 @@ check_date_args(int year, int month, int day)
 {
 
     if (year < MINYEAR || year > MAXYEAR) {
-        PyErr_Format(PyExc_ValueError, "year %i is out of range", year);
+        PyErr_Format(PyExc_ValueError,
+                     "year is out of range, must be in %i..%i, got %i",
+                     MINYEAR, MAXYEAR, year);
         return -1;
     }
     if (month < 1 || month > 12) {
-        PyErr_SetString(PyExc_ValueError,
-                        "month must be in 1..12");
+        PyErr_Format(PyExc_ValueError, "month must be in 1..12, got %i", month);
         return -1;
     }
-    if (day < 1 || day > days_in_month(year, month)) {
-        PyErr_SetString(PyExc_ValueError,
-                        "day is out of range for month");
+    int dim = days_in_month(year, month);
+    if (day < 1 || day > dim) {
+        PyErr_Format(PyExc_ValueError,
+                        "day is out of range for month, must be in 1..%i, got %i", dim, day);
         return -1;
     }
     return 0;
@@ -439,23 +441,23 @@ static int
 check_time_args(int h, int m, int s, int us, int fold)
 {
     if (h < 0 || h > 23) {
-        PyErr_SetString(PyExc_ValueError,
-                        "hour must be in 0..23");
+        PyErr_Format(PyExc_ValueError,
+                        "hour must be in 0..23, got %i", h);
         return -1;
     }
     if (m < 0 || m > 59) {
-        PyErr_SetString(PyExc_ValueError,
-                        "minute must be in 0..59");
+        PyErr_Format(PyExc_ValueError,
+                        "minute must be in 0..59, got %i", m);
         return -1;
     }
     if (s < 0 || s > 59) {
-        PyErr_SetString(PyExc_ValueError,
-                        "second must be in 0..59");
+        PyErr_Format(PyExc_ValueError,
+                        "second must be in 0..59, got %i", s);
         return -1;
     }
     if (us < 0 || us > 999999) {
-        PyErr_SetString(PyExc_ValueError,
-                        "microsecond must be in 0..999999");
+        PyErr_Format(PyExc_ValueError,
+                        "microsecond must be in 0..999999, got %i", us);
         return -1;
     }
     if (fold != 0 && fold != 1) {
@@ -3018,7 +3020,9 @@ date_fromisocalendar(PyObject *cls, PyObject *args, PyObject *kw)
 
     // Year is bounded to 0 < year < 10000 because 9999-12-31 is (9999, 52, 5)
     if (year < MINYEAR || year > MAXYEAR) {
-        PyErr_Format(PyExc_ValueError, "Year is out of range: %d", year);
+        PyErr_Format(PyExc_ValueError, "year %i is out of range", year,
+                     "must be in %i..%i", MINYEAR, MAXYEAR,
+                     ", got %i", year);
         return NULL;
     }
 
@@ -4927,7 +4931,9 @@ utc_to_seconds(int year, int month, int day,
 
     /* ymd_to_ord() doesn't support year <= 0 */
     if (year < MINYEAR || year > MAXYEAR) {
-        PyErr_Format(PyExc_ValueError, "year %i is out of range", year);
+        PyErr_Format(PyExc_ValueError, "year %i is out of range", year,
+                     "must be in %i..%i", MINYEAR, MAXYEAR,
+                     ", got %i", year);
         return -1;
     }
 

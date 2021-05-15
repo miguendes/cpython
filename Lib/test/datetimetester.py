@@ -515,6 +515,13 @@ class TestTimeDelta(HarmlessMixedComparison, unittest.TestCase):
         eq(td(seconds=0.001), td(milliseconds=1))
         eq(td(milliseconds=0.001), td(microseconds=1))
 
+        # check bad arguments
+        for bad_arg in ("12", object()):
+            error_msg = ("unsupported type for timedelta hours component: "
+                         "must be an int or float, not '{}'").format(type(bad_arg).__name__)
+            with self.assertRaisesRegex(TypeError, error_msg):
+                td(hours=bad_arg)
+
     def test_computations(self):
         eq = self.assertEqual
         td = timedelta
@@ -1195,11 +1202,17 @@ class TestDate(HarmlessMixedComparison, unittest.TestCase):
         self.theclass(MAXYEAR, 1, 1)  # no exception
         self.assertRaises(ValueError, self.theclass, MINYEAR-1, 1, 1)
         self.assertRaises(ValueError, self.theclass, MAXYEAR+1, 1, 1)
+        with self.assertRaisesRegex(ValueError,
+                                    ("year is out of range, "
+                                     "must be in {}..{}, got {}").format(MINYEAR, MAXYEAR, MAXYEAR+1)):
+            self.theclass(MAXYEAR+1, 1, 1)
         # bad months
         self.theclass(2000, 1, 1)    # no exception
         self.theclass(2000, 12, 1)   # no exception
         self.assertRaises(ValueError, self.theclass, 2000, 0, 1)
         self.assertRaises(ValueError, self.theclass, 2000, 13, 1)
+        with self.assertRaisesRegex(ValueError, "month must be in 1..12, got 13"):
+            self.theclass(2000, 13, 1)
         # bad days
         self.theclass(2000, 2, 29)   # no exception
         self.theclass(2004, 2, 29)   # no exception
@@ -1210,6 +1223,8 @@ class TestDate(HarmlessMixedComparison, unittest.TestCase):
         self.assertRaises(ValueError, self.theclass, 1900, 2, 29)
         self.assertRaises(ValueError, self.theclass, 2000, 1, 0)
         self.assertRaises(ValueError, self.theclass, 2000, 1, 32)
+        with self.assertRaisesRegex(ValueError, "day is out of range for month, must be in 1..31, got 32"):
+            self.theclass(2000, 1, 32)
 
     def test_hash_equality(self):
         d = self.theclass(2000, 12, 31)
@@ -2154,11 +2169,17 @@ class TestDateTime(TestDate):
         self.theclass(MAXYEAR, 1, 1)  # no exception
         self.assertRaises(ValueError, self.theclass, MINYEAR-1, 1, 1)
         self.assertRaises(ValueError, self.theclass, MAXYEAR+1, 1, 1)
+        with self.assertRaisesRegex(ValueError,
+                                    ("year is out of range, "
+                                     "must be in {}..{}, got {}").format(MINYEAR, MAXYEAR, MAXYEAR+1)):
+            self.theclass(MAXYEAR+1, 1, 1)
         # bad months
         self.theclass(2000, 1, 1)    # no exception
         self.theclass(2000, 12, 1)   # no exception
         self.assertRaises(ValueError, self.theclass, 2000, 0, 1)
         self.assertRaises(ValueError, self.theclass, 2000, 13, 1)
+        with self.assertRaisesRegex(ValueError, "month must be in 1..12, got 13"):
+            self.theclass(2000, 13, 1)
         # bad days
         self.theclass(2000, 2, 29)   # no exception
         self.theclass(2004, 2, 29)   # no exception
@@ -2169,21 +2190,29 @@ class TestDateTime(TestDate):
         self.assertRaises(ValueError, self.theclass, 1900, 2, 29)
         self.assertRaises(ValueError, self.theclass, 2000, 1, 0)
         self.assertRaises(ValueError, self.theclass, 2000, 1, 32)
+        with self.assertRaisesRegex(ValueError, "day is out of range for month, must be in 1..31, got 32"):
+            self.theclass(2000, 1, 32)
         # bad hours
         self.theclass(2000, 1, 31, 0)    # no exception
         self.theclass(2000, 1, 31, 23)   # no exception
         self.assertRaises(ValueError, self.theclass, 2000, 1, 31, -1)
         self.assertRaises(ValueError, self.theclass, 2000, 1, 31, 24)
+        with self.assertRaisesRegex(ValueError, "hour must be in 0..23, got 24"):
+            self.theclass(2000, 1, 31, 24)
         # bad minutes
         self.theclass(2000, 1, 31, 23, 0)    # no exception
         self.theclass(2000, 1, 31, 23, 59)   # no exception
         self.assertRaises(ValueError, self.theclass, 2000, 1, 31, 23, -1)
         self.assertRaises(ValueError, self.theclass, 2000, 1, 31, 23, 60)
+        with self.assertRaisesRegex(ValueError, "minute must be in 0..59, got 60"):
+            self.theclass(2000, 1, 31, 23, 60)
         # bad seconds
         self.theclass(2000, 1, 31, 23, 59, 0)    # no exception
         self.theclass(2000, 1, 31, 23, 59, 59)   # no exception
         self.assertRaises(ValueError, self.theclass, 2000, 1, 31, 23, 59, -1)
         self.assertRaises(ValueError, self.theclass, 2000, 1, 31, 23, 59, 60)
+        with self.assertRaisesRegex(ValueError, "second must be in 0..59, got 60"):
+            self.theclass(2000, 1, 31, 23, 59, 60)
         # bad microseconds
         self.theclass(2000, 1, 31, 23, 59, 59, 0)    # no exception
         self.theclass(2000, 1, 31, 23, 59, 59, 999999)   # no exception
@@ -2192,6 +2221,8 @@ class TestDateTime(TestDate):
         self.assertRaises(ValueError, self.theclass,
                           2000, 1, 31, 23, 59, 59,
                           1000000)
+        with self.assertRaisesRegex(ValueError, "microsecond must be in 0..999999, got -1"):
+            self.theclass(2000, 1, 31, 23, 59, 59, -1)
         # bad fold
         self.assertRaises(ValueError, self.theclass,
                           2000, 1, 31, fold=-1)
@@ -6167,14 +6198,6 @@ class CapiTest(unittest.TestCase):
             for exact in (True, False):
                 with self.subTest(arg=arg, exact=exact):
                     self.assertFalse(is_timedelta(arg, exact))
-
-        # check bad arguments
-        for bad_arg in ("12", object()):
-            error_msg = ("unsupported type for timedelta hours component: "
-                         "must be an int or float, not '{}'").format(type(bad_arg).__name__)
-
-            with self.assertRaisesRegex(TypeError, error_msg):
-                timedelta(hours=bad_arg)
 
     def test_check_tzinfo(self):
         class TZInfoSubclass(tzinfo):

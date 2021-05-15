@@ -386,12 +386,12 @@ def _check_date_fields(year, month, day):
     month = _index(month)
     day = _index(day)
     if not MINYEAR <= year <= MAXYEAR:
-        raise ValueError('year must be in %d..%d' % (MINYEAR, MAXYEAR), year)
+        raise ValueError('year is out of range, must be in %d..%d, got %d' % (MINYEAR, MAXYEAR, year))
     if not 1 <= month <= 12:
-        raise ValueError('month must be in 1..12', month)
+        raise ValueError('month must be in 1..12, got %d' % month)
     dim = _days_in_month(year, month)
     if not 1 <= day <= dim:
-        raise ValueError('day must be in 1..%d' % dim, day)
+        raise ValueError('day is out of range for month, must be in 1..%d, got %d' % (dim, day))
     return year, month, day
 
 def _check_time_fields(hour, minute, second, microsecond, fold):
@@ -400,16 +400,22 @@ def _check_time_fields(hour, minute, second, microsecond, fold):
     second = _index(second)
     microsecond = _index(microsecond)
     if not 0 <= hour <= 23:
-        raise ValueError('hour must be in 0..23', hour)
+        raise ValueError('hour must be in 0..23, got %d' % hour)
     if not 0 <= minute <= 59:
-        raise ValueError('minute must be in 0..59', minute)
+        raise ValueError('minute must be in 0..59, got %d' % minute)
     if not 0 <= second <= 59:
-        raise ValueError('second must be in 0..59', second)
+        raise ValueError('second must be in 0..59, got %d' % second)
     if not 0 <= microsecond <= 999999:
-        raise ValueError('microsecond must be in 0..999999', microsecond)
+        raise ValueError('microsecond must be in 0..999999, got %d' % microsecond)
     if fold not in (0, 1):
         raise ValueError('fold must be either 0 or 1', fold)
     return hour, minute, second, microsecond, fold
+
+def _check_timedelta_fields(**kwargs):
+    for arg_name, arg_value in kwargs.items():
+        if not (isinstance(arg_value, int) or isinstance(arg_value, float)):
+            raise TypeError("unsupported type for timedelta %s component:"
+                            " must be an int or float, not '%.200s'" % (arg_name, type(arg_value).__name__))
 
 def _check_tzinfo_arg(tz):
     if tz is not None and not isinstance(tz, tzinfo):
@@ -468,7 +474,10 @@ class timedelta:
         # guide the C implementation; it's way more convoluted than speed-
         # ignoring auto-overflow-to-long idiomatic Python could be.
 
-        # XXX Check that all inputs are ints or floats.
+        # Check that all inputs are ints or floats.
+        _check_timedelta_fields(days=days, seconds=seconds, microseconds=microseconds,
+                                milliseconds=milliseconds, minutes=minutes,
+                                hours=hours, weeks=weeks)
 
         # Final values, all integer.
         # s and us fit in 32-bit signed ints; d isn't bounded.
@@ -2509,7 +2518,7 @@ else:
     # Clean up unused names
     del (_DAYNAMES, _DAYS_BEFORE_MONTH, _DAYS_IN_MONTH, _DI100Y, _DI400Y,
          _DI4Y, _EPOCH, _MAXORDINAL, _MONTHNAMES, _build_struct_time,
-         _check_date_fields, _check_time_fields,
+         _check_date_fields, _check_time_fields, _check_timedelta_fields,
          _check_tzinfo_arg, _check_tzname, _check_utc_offset, _cmp, _cmperror,
          _date_class, _days_before_month, _days_before_year, _days_in_month,
          _format_time, _format_offset, _index, _is_leap, _isoweek1monday, _math,
