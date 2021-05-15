@@ -3657,8 +3657,8 @@ tzinfo_fromutc(PyDateTime_TZInfo *self, PyObject *dt)
     PyDateTime_Delta *delta = NULL;
 
     if (!PyDateTime_Check(dt)) {
-        PyErr_SetString(PyExc_TypeError,
-                        "fromutc: argument must be a datetime");
+        PyErr_Format(PyExc_TypeError, "fromutc: argument must be a datetime, not '%.200s'",
+                     Py_TYPE(dt)->tp_name);
         return NULL;
     }
     if (GET_DT_TZINFO(dt) != (PyObject *)self) {
