@@ -510,13 +510,6 @@ class TestTimeDelta(HarmlessMixedComparison, unittest.TestCase):
         eq(td(seconds=0.001), td(milliseconds=1))
         eq(td(milliseconds=0.001), td(microseconds=1))
 
-        # check bad arguments
-        for bad_arg in (object(), "12"):
-            error_msg = ("unsupported type for timedelta hours component: "
-                         "must be an int or float, not '{}'").format(type(bad_arg).__name__)
-            with self.assertRaisesRegex(TypeError, error_msg):
-                td(hours=bad_arg)
-
     def test_computations(self):
         eq = self.assertEqual
         td = timedelta
@@ -6160,6 +6153,15 @@ class CapiTest(unittest.TestCase):
             for exact in (True, False):
                 with self.subTest(arg=arg, exact=exact):
                     self.assertFalse(is_timedelta(arg, exact))
+
+        # check bad arguments
+        for bad_arg in ("12", object()):
+            error_msg = ("unsupported type for timedelta hours component: "
+                         "must be an int or float, not '{}'").format(type(bad_arg).__name__)
+
+            with self.assertRaisesRegex(TypeError, error_msg):
+                timedelta(hours=bad_arg)
+ 
 
     def test_check_tzinfo(self):
         class TZInfoSubclass(tzinfo):
