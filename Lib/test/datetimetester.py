@@ -5004,6 +5004,12 @@ class TestTimezoneConversions(unittest.TestCase):
         self.assertRaises(TypeError, Eastern.fromutc, now, now) # too many args
         self.assertRaises(TypeError, Eastern.fromutc, date.today()) # wrong type
 
+        # check error message
+        arg = b'2020-02-02'
+        with self.assertRaisesRegex(TypeError,
+                                    "fromutc: argument must be a datetime, not '{}'".format(type(arg).__name__)):
+            Eastern.fromutc(arg)
+
         # Always converts UTC to standard time.
         class FauxUSTimeZone(USTimeZone):
             def fromutc(self, dt):

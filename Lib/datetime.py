@@ -1138,7 +1138,7 @@ class tzinfo:
         "datetime in UTC -> datetime in local time."
 
         if not isinstance(dt, datetime):
-            raise TypeError("fromutc() requires a datetime argument")
+            raise TypeError("fromutc: argument must be a datetime, not '%s'" % type(dt).__name__)
         if dt.tzinfo is not self:
             raise ValueError("dt.tzinfo is not self")
 
