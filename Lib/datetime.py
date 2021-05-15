@@ -849,7 +849,7 @@ class date:
     def fromisoformat(cls, date_string):
         """Construct a date from the output of date.isoformat()."""
         if not isinstance(date_string, str):
-            raise TypeError('fromisoformat: argument must be str')
+            raise TypeError("fromisoformat: argument must be str, not '%s'" % type(date_string).__name__)
 
         try:
             assert len(date_string) == 10
@@ -1437,7 +1437,7 @@ class time:
     def fromisoformat(cls, time_string):
         """Construct a time from the output of isoformat()."""
         if not isinstance(time_string, str):
-            raise TypeError('fromisoformat: argument must be str')
+            raise TypeError("fromisoformat: argument must be str, not '%s'" % type(time_string).__name__)
 
         try:
             return cls(*_parse_isoformat_time(time_string))
@@ -1721,7 +1721,7 @@ class datetime(date):
     def fromisoformat(cls, date_string):
         """Construct a datetime from the output of datetime.isoformat()."""
         if not isinstance(date_string, str):
-            raise TypeError('fromisoformat: argument must be str')
+            raise TypeError("fromisoformat: argument must be str, not '%s'" % type(date_string).__name__)
 
         # Split this at the separator
         dstr = date_string[0:10]

@@ -1868,6 +1868,9 @@ class TestDate(HarmlessMixedComparison, unittest.TestCase):
             with self.assertRaises(TypeError):
                 self.theclass.fromisoformat(bad_type)
 
+        with self.assertRaisesRegex(TypeError, "fromisoformat: argument must be str, not 'bytes'"):
+            self.theclass.fromisoformat(b'2009-03-01')
+
     def test_fromisocalendar(self):
         # For each test case, assert that fromisocalendar is the
         # inverse of the isocalendar function
@@ -6161,7 +6164,6 @@ class CapiTest(unittest.TestCase):
 
             with self.assertRaisesRegex(TypeError, error_msg):
                 timedelta(hours=bad_arg)
- 
 
     def test_check_tzinfo(self):
         class TZInfoSubclass(tzinfo):
