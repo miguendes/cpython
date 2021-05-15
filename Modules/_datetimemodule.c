@@ -4570,7 +4570,8 @@ time_fromisoformat(PyObject *cls, PyObject *tstr) {
     assert(tstr != NULL);
 
     if (!PyUnicode_Check(tstr)) {
-        PyErr_SetString(PyExc_TypeError, "fromisoformat: argument must be str");
+        PyErr_Format(PyExc_TypeError, "fromisoformat: argument must be str, not '%.200s'",
+                     Py_TYPE(tstr)->tp_name);
         return NULL;
     }
 
@@ -5237,8 +5238,8 @@ datetime_fromisoformat(PyObject *cls, PyObject *dtstr)
     assert(dtstr != NULL);
 
     if (!PyUnicode_Check(dtstr)) {
-        PyErr_SetString(PyExc_TypeError,
-                        "fromisoformat: argument must be str");
+        PyErr_Format(PyExc_TypeError, "fromisoformat: argument must be str, not '%.200s'",
+                     Py_TYPE(dtstr)->tp_name);
         return NULL;
     }
 
